@@ -102,7 +102,7 @@ a { color: inherit; }
 .demo-link { padding: 2px 0; border: 0; color: #6e746c; background: transparent; cursor: pointer; font-size: 8px; text-align: left; text-decoration: underline; text-underline-offset: 2px; }
 .demo-link:hover { color: var(--blue); }
 
-.button { display: inline-flex; min-height: 37px; align-items: center; justify-content: center; padding: 0 12px; border: 1px solid transparent; border-radius: 7px; cursor: pointer; font-size: 9px; font-weight: 750; }
+.button { display: inline-flex; min-height: 37px; align-items: center; justify-content: center; padding: 0 12px; border: 1px solid transparent; border-radius: 7px; cursor: pointer; font-size: 9px; font-weight: 750; text-decoration: none; }
 .button:disabled { cursor: default; opacity: .42; }
 .primary { color: var(--ink); background: var(--acid); }
 .primary:hover:not(:disabled) { background: #d8ff78; }
@@ -126,9 +126,13 @@ a { color: inherit; }
 .scan-strip > div > span { color: #7f847c; font-size: 8px; text-transform: uppercase; }
 .scan-strip p { margin: 0; color: #888d85; font: 8px ui-monospace, SFMono-Regular, Consolas, monospace; }
 .scan-list { display: flex; gap: 4px; }
+.scan-history-item { position: relative; display: inline-flex; }
 .scan-chip { width: 26px; height: 24px; padding: 0; border: 1px solid var(--line); border-radius: 5px; color: #6f746d; background: #fff; cursor: pointer; font-size: 8px; }
 .scan-chip:hover, .scan-chip.active { border-color: var(--ink); color: #fff; background: var(--ink); }
 .scan-chip.running::after { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); content: ""; animation: pulse 1s infinite; }
+.delete-scan { position: absolute; top: -7px; right: -7px; display: none; width: 15px; height: 15px; align-items: center; justify-content: center; padding: 0 0 1px; border: 1px solid #e3bbb4; border-radius: 50%; color: #9f4438; background: #fff8f6; cursor: pointer; font-size: 11px; line-height: 1; }
+.scan-history-item.active .delete-scan, .scan-history-item:hover .delete-scan, .delete-scan:focus-visible { display: flex; }
+.delete-scan:disabled { display: none; }
 
 .scan-state { display: flex; align-items: center; gap: 12px; margin-top: 18px; padding: 14px 15px; border: 1px solid #ccd2ff; border-radius: 8px; background: #f3f5ff; }
 .scanner-dot { width: 10px; height: 10px; flex: 0 0 auto; border: 2px solid #c4caff; border-top-color: var(--blue); border-radius: 50%; animation: spin .8s linear infinite; }
@@ -192,6 +196,10 @@ body > footer { margin-top: 55px; padding: 22px 0 30px; border-top: 1px solid va
 .toast.error { color: #ffd7d0; background: #6e2d25; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes pulse { 50% { opacity: .3; } }
+
+@media (hover: none) {
+  .delete-scan:not(:disabled) { display: flex; }
+}
 
 @media (max-width: 900px) {
   .workspace { grid-template-columns: 1fr; }

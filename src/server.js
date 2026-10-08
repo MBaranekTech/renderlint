@@ -159,6 +159,17 @@ app.get('/api/scans/:id', (request, response) => {
   return response.json({ scan });
 });
 
+app.delete('/api/scans/:id', (request, response) => {
+  const scan = getScan(request.params.id);
+  if (!scan) return response.status(404).json({ error: 'Scan not found.' });
+  if (['queued', 'running'].includes(scan.status)) {
+    return response.status(409).json({ error: 'A running scan cannot be deleted.' });
+  }
+  database.prepare('DELETE FROM scans WHERE id = ?').run(scan.id);
+  fs.rmSync(path.join(evidenceDir, scan.id), { recursive: true, force: true });
+  return response.json({ deleted: true });
+});
+
 app.get('/api/scans/:id/prompt', (request, response) => {
   const scan = getScan(request.params.id, true);
   if (!scan) return response.status(404).json({ error: 'Scan not found.' });

@@ -16,6 +16,8 @@ test('creates a project, scans the broken demo, and renders an actionable report
     await page.locator('#use-demo').click();
     await page.locator('#project-form button[type="submit"]').click();
     await expect(page.locator('#project-name')).toHaveText('Broken demo');
+    await expect(page.locator('#open-target')).toHaveAttribute('href', `${baseUrl}/demo.html`);
+    await expect(page.locator('#open-target')).toHaveAttribute('target', '_blank');
 
     projectId = await page.evaluate(async () => {
       const payload = await fetch('/api/projects').then((response) => response.json());
@@ -61,6 +63,12 @@ test('creates a project, scans the broken demo, and renders an actionable report
     await expect(page.locator('#scan-list .scan-chip')).toHaveCount(scanCount + 1);
     await expect(page.locator('#scan-state')).toBeVisible();
     await expect(page.locator('#report')).toBeVisible({ timeout: 45_000 });
+
+    page.once('dialog', (dialog) => dialog.accept());
+    await page.locator('.scan-history-item').first().hover();
+    await page.locator('.scan-history-item').first().locator('.delete-scan').click();
+    await expect(page.locator('#scan-list .scan-chip')).toHaveCount(scanCount);
+    await expect(page.locator('#toast')).toContainText('Scan deleted.');
 
     const total = Number(await page.locator('#summary-total').textContent());
     expect(total).toBeGreaterThan(0);
