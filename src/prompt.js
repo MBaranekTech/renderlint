@@ -32,15 +32,22 @@ function buildAgentPrompt(project, scan) {
   return lines.join('\n');
 }
 
-function buildBriefFilename(scan) {
+function targetSlug(scan) {
   let label = 'website';
   try {
     label = new URL(scan.targetUrl).hostname || label;
   } catch {
     // Keep the generic label if stored scan data does not contain a valid URL.
   }
-  const slug = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'website';
-  return `renderlint-${slug}-report.md`;
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'website';
 }
 
-module.exports = { buildAgentPrompt, buildBriefFilename };
+function buildBriefFilename(scan) {
+  return `renderlint-${targetSlug(scan)}-report.md`;
+}
+
+function buildJsonFilename(scan) {
+  return `renderlint-${targetSlug(scan)}-report.json`;
+}
+
+module.exports = { buildAgentPrompt, buildBriefFilename, buildJsonFilename };

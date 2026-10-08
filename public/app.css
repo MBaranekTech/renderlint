@@ -177,7 +177,10 @@ a { color: inherit; }
 .severity.medium { color: #99531d; background: #fff0df; }
 .severity.low { color: #61665f; background: #eceee9; }
 .issue-copy { min-width: 0; }
+.issue-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .issue h4 { margin: 0; font-size: 11px; }
+.copy-finding { flex: 0 0 auto; padding: 2px 0; border: 0; color: #737870; background: transparent; cursor: pointer; font-size: 8px; text-decoration: underline; text-underline-offset: 2px; }
+.copy-finding:hover { color: var(--blue); }
 .issue p { max-width: 700px; margin: 6px 0 9px; color: var(--muted); font-size: 9px; line-height: 1.5; white-space: pre-line; }
 .selector { display: block; overflow: hidden; color: #506417; font: 8px ui-monospace, SFMono-Regular, Consolas, monospace; text-overflow: ellipsis; white-space: nowrap; }
 .issue-meta { color: #858a82; font: 7px ui-monospace, SFMono-Regular, Consolas, monospace; text-align: right; text-transform: uppercase; }

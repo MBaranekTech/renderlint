@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 
 const baseUrl = process.env.RENDERLINT_URL || 'http://127.0.0.1:8791';
-test.setTimeout(60_000);
+test.setTimeout(90_000);
 
 test('creates a project, scans the broken demo, and renders an actionable report', async ({ page, request }) => {
   const errors = [];
@@ -30,6 +30,8 @@ test('creates a project, scans the broken demo, and renders an actionable report
     await expect(page.locator('#issue-list')).toContainText('Page overflows horizontally');
     await expect(page.locator('#copy-prompt')).toBeEnabled();
     await expect(page.locator('#download-brief')).toBeEnabled();
+    await expect(page.locator('#download-json')).toBeEnabled();
+    await expect(page.locator('.copy-finding').first()).toBeVisible();
 
     const downloadPromise = page.waitForEvent('download');
     await page.locator('#download-brief').click();
@@ -40,6 +42,25 @@ test('creates a project, scans the broken demo, and renders an actionable report
       for await (const chunk of stream) content += chunk.toString();
       return content;
     })).toContain('Project: Broken demo');
+
+    const jsonDownloadPromise = page.waitForEvent('download');
+    await page.locator('#download-json').click();
+    const jsonDownload = await jsonDownloadPromise;
+    expect(jsonDownload.suggestedFilename()).toBe('renderlint-127-0-0-1-report.json');
+    const jsonPath = await jsonDownload.path();
+    const report = JSON.parse(require('node:fs').readFileSync(jsonPath, 'utf8'));
+    expect(report.schemaVersion).toBe(1);
+    expect(report.project.name).toBe('Broken demo');
+    expect(report.scan.issues.length).toBeGreaterThan(0);
+
+    await page.locator('.copy-finding').first().click();
+    await expect(page.locator('#toast')).toContainText('Finding copied.');
+
+    const scanCount = await page.locator('#scan-list .scan-chip').count();
+    await page.keyboard.press('Control+Enter');
+    await expect(page.locator('#scan-list .scan-chip')).toHaveCount(scanCount + 1);
+    await expect(page.locator('#scan-state')).toBeVisible();
+    await expect(page.locator('#report')).toBeVisible({ timeout: 45_000 });
 
     const total = Number(await page.locator('#summary-total').textContent());
     expect(total).toBeGreaterThan(0);
