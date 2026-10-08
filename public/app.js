@@ -116,6 +116,7 @@
     $('project-name').textContent = project.name;
     $('project-url').href = project.targetUrl;
     $('project-url').textContent = project.targetUrl;
+    $('open-target').href = project.targetUrl;
     await loadScans();
   }
 
@@ -139,13 +140,33 @@
     const list = $('scan-list');
     list.innerHTML = '';
     state.scans.slice(0, 8).forEach((scan, index) => {
+      const item = document.createElement('span');
+      item.className = `scan-history-item${scan.id === state.activeScan?.id ? ' active' : ''}`;
       const button = document.createElement('button');
       button.type = 'button';
       button.className = `scan-chip ${scan.status}${scan.id === state.activeScan?.id ? ' active' : ''}`;
       button.title = `${formatDate(scan.createdAt)} · ${scan.status}`;
       button.textContent = scan.status === 'running' || scan.status === 'queued' ? '' : String(state.scans.length - index).padStart(2, '0');
       button.addEventListener('click', () => loadScan(scan.id));
-      list.appendChild(button);
+      const deleteButton = document.createElement('button');
+      deleteButton.type = 'button';
+      deleteButton.className = 'delete-scan';
+      deleteButton.title = `Delete scan ${state.scans.length - index}`;
+      deleteButton.setAttribute('aria-label', `Delete scan ${state.scans.length - index}`);
+      deleteButton.textContent = '×';
+      deleteButton.disabled = ['queued', 'running'].includes(scan.status);
+      deleteButton.addEventListener('click', async () => {
+        if (!confirm(`Delete this ${formatDate(scan.createdAt)} scan and its evidence?`)) return;
+        try {
+          await request(`/api/scans/${scan.id}`, { method: 'DELETE' });
+          await loadProjects(state.activeProject.id);
+          toast('Scan deleted.');
+        } catch (error) {
+          toast(error.message, true);
+        }
+      });
+      item.append(button, deleteButton);
+      list.appendChild(item);
     });
   }
 

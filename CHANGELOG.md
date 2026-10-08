@@ -10,6 +10,7 @@ Versioning once a stable public API is established.
 - Download completed repair briefs as hostname-based Markdown files.
 - Export complete scan results as structured JSON reports.
 - Copy individual findings and rerun scans with `Ctrl/Command+Enter`.
+- Open target websites directly and delete individual scans with their stored evidence.
 - GitHub Actions checks for unit, browser, Docker, and smoke tests.
 - Playwright browser-test configuration.
 - Project license and community health documentation.

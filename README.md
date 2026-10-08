@@ -26,6 +26,7 @@ exact DOM selectors and evidence for Codex, Claude Code, Cursor, or another codi
 - Agent-ready repair briefs that can be copied or downloaded as Markdown.
 - Structured JSON report export for CI and custom automation.
 - One-click copying for individual findings and `Ctrl/Command+Enter` scan reruns.
+- Direct target-site access and deletion of individual historical scans with their evidence.
 - A deliberately broken local demo for validating the scanner.
 - No hosted service, account, analytics, or LLM API required.
 
