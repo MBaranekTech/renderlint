@@ -6,7 +6,7 @@ const path = require('node:path');
 const express = require('express');
 const { createDatabase, mapProject, mapScan } = require('./database');
 const { scanWebsite } = require('./scanner');
-const { buildAgentPrompt, buildBriefFilename } = require('./prompt');
+const { buildAgentPrompt, buildBriefFilename, buildJsonFilename } = require('./prompt');
 
 const port = Number(process.env.PORT || 8787);
 const host = process.env.HOST || '127.0.0.1';
@@ -174,6 +174,19 @@ app.get('/api/scans/:id/brief', (request, response) => {
   const project = mapProject(getProject(scan.projectId));
   response.attachment(buildBriefFilename(scan));
   response.type('text/markdown').send(buildAgentPrompt(project, scan));
+});
+
+app.get('/api/scans/:id/report', (request, response) => {
+  const scan = getScan(request.params.id, true);
+  if (!scan) return response.status(404).json({ error: 'Scan not found.' });
+  if (scan.status !== 'completed') return response.status(409).json({ error: 'The scan is not complete.' });
+  const project = mapProject(getProject(scan.projectId));
+  response.attachment(buildJsonFilename(scan));
+  return response.json({
+    schemaVersion: 1,
+    project: { id: project.id, name: project.name, targetUrl: project.targetUrl },
+    scan,
+  });
 });
 
 app.use('/evidence', express.static(evidenceDir, { dotfiles: 'deny', fallthrough: false, immutable: false }));

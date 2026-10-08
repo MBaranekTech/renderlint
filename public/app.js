@@ -32,6 +32,27 @@
     return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
   }
 
+  async function copyText(value) {
+    if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(value);
+    const textarea = document.createElement('textarea');
+    textarea.value = value;
+    textarea.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    textarea.remove();
+  }
+
+  function downloadScan(path) {
+    if (!state.activeScan) return;
+    const link = document.createElement('a');
+    link.href = `/api/scans/${encodeURIComponent(state.activeScan.id)}/${path}`;
+    link.hidden = true;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  }
+
   function renderProjects() {
     const list = $('project-list');
     list.innerHTML = '';
@@ -87,6 +108,7 @@
     state.activeScan = null;
     $('copy-prompt').disabled = true;
     $('download-brief').disabled = true;
+    $('download-json').disabled = true;
     localStorage.setItem('renderlint:activeProject', id);
     renderProjects();
     $('project-placeholder').hidden = true;
@@ -134,6 +156,7 @@
     $('scan-meta').textContent = 'No scans yet.';
     $('copy-prompt').disabled = true;
     $('download-brief').disabled = true;
+    $('download-json').disabled = true;
   }
 
   async function loadScan(id) {
@@ -162,6 +185,7 @@
     $('run-scan').disabled = true;
     $('copy-prompt').disabled = true;
     $('download-brief').disabled = true;
+    $('download-json').disabled = true;
   }
 
   function showFailed(message) {
@@ -174,6 +198,7 @@
     $('run-scan').disabled = false;
     $('copy-prompt').disabled = true;
     $('download-brief').disabled = true;
+    $('download-json').disabled = true;
   }
 
   async function pollScan(id, token) {
@@ -205,6 +230,7 @@
     $('run-scan').disabled = false;
     $('copy-prompt').disabled = false;
     $('download-brief').disabled = false;
+    $('download-json').disabled = false;
     $('summary-total').textContent = scan.summary.total;
     ['critical', 'high', 'medium', 'low'].forEach((severity) => {
       $(`summary-${severity}`).textContent = scan.summary.bySeverity[severity] || 0;
@@ -270,12 +296,35 @@
       copy.className = 'issue-copy';
       const title = document.createElement('h4');
       title.textContent = issue.title;
+      const heading = document.createElement('div');
+      heading.className = 'issue-heading';
+      const copyButton = document.createElement('button');
+      copyButton.className = 'copy-finding';
+      copyButton.type = 'button';
+      copyButton.textContent = 'Copy finding';
+      copyButton.addEventListener('click', async () => {
+        const finding = [
+          `## [${issue.severity.toUpperCase()}] ${issue.title}`,
+          `Category: ${issue.category}`,
+          `Rule: ${issue.rule}`,
+          `Viewport(s): ${issue.viewports.join(', ')}`,
+          `Selector: ${issue.selector}`,
+          `Evidence: ${issue.detail}`,
+        ].join('\n');
+        try {
+          await copyText(finding);
+          toast('Finding copied.');
+        } catch (error) {
+          toast(error.message, true);
+        }
+      });
+      heading.append(title, copyButton);
       const detail = document.createElement('p');
       detail.textContent = issue.detail;
       const selector = document.createElement('code');
       selector.className = 'selector';
       selector.textContent = issue.selector;
-      copy.append(title, detail, selector);
+      copy.append(heading, detail, selector);
       const meta = document.createElement('span');
       meta.className = 'issue-meta';
       meta.textContent = `${issue.category} · ${issue.viewports.join(', ')}`;
@@ -311,7 +360,7 @@
     form.elements.name.focus();
   });
 
-  $('run-scan').addEventListener('click', async () => {
+  async function runScan() {
     if (!state.activeProject) return;
     $('run-scan').disabled = true;
     try {
@@ -327,22 +376,22 @@
       toast(error.message, true);
       $('run-scan').disabled = false;
     }
+  }
+
+  $('run-scan').addEventListener('click', runScan);
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' || (!event.ctrlKey && !event.metaKey) || event.repeat) return;
+    if (!state.activeProject || $('run-scan').disabled) return;
+    event.preventDefault();
+    runScan();
   });
 
   $('copy-prompt').addEventListener('click', async () => {
     if (!state.activeScan) return;
     try {
       const prompt = await request(`/api/scans/${state.activeScan.id}/prompt`, {}, true);
-      if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(prompt);
-      else {
-        const textarea = document.createElement('textarea');
-        textarea.value = prompt;
-        textarea.style.cssText = 'position:fixed;opacity:0';
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        textarea.remove();
-      }
+      await copyText(prompt);
       toast('Agent repair brief copied.');
     } catch (error) {
       toast(error.message, true);
@@ -350,14 +399,13 @@
   });
 
   $('download-brief').addEventListener('click', () => {
-    if (!state.activeScan) return;
-    const link = document.createElement('a');
-    link.href = `/api/scans/${encodeURIComponent(state.activeScan.id)}/brief`;
-    link.hidden = true;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    downloadScan('brief');
     toast('Repair brief download started.');
+  });
+
+  $('download-json').addEventListener('click', () => {
+    downloadScan('report');
+    toast('JSON report download started.');
   });
 
   $('delete-project').addEventListener('click', async () => {

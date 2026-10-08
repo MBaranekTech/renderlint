@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { buildAgentPrompt, buildBriefFilename } = require('../src/prompt');
+const { buildAgentPrompt, buildBriefFilename, buildJsonFilename } = require('../src/prompt');
 
 test('agent prompt contains verified evidence and implementation constraints', () => {
   const prompt = buildAgentPrompt(
@@ -31,4 +31,8 @@ test('repair brief filename uses a safe target hostname slug', () => {
     'renderlint-docs-example-com-report.md',
   );
   assert.equal(buildBriefFilename({ targetUrl: 'not a URL' }), 'renderlint-website-report.md');
+  assert.equal(
+    buildJsonFilename({ targetUrl: 'https://Docs.Example.com:8443/path?q=1' }),
+    'renderlint-docs-example-com-report.json',
+  );
 });
