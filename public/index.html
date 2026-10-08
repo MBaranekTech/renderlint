@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Real-browser QA before you ship.">
+  <title>RenderLint — real-browser QA before you ship</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="app.css?v=1">
+  <script src="app.js?v=1" defer></script>
+</head>
+<body>
+  <header class="topbar shell">
+    <a class="brand" href="./"><img src="icon.svg" alt=""><span>RenderLint</span></a>
+    <span class="local"><i></i>Local-first website preflight</span>
+  </header>
+
+  <main class="shell">
+    <section class="intro">
+      <p class="eyebrow">Real-browser website QA</p>
+      <h1>Catch what the prompt missed.</h1>
+      <p>Scan a real website across viewports. Turn layout, accessibility, and runtime failures into exact tasks for your coding agent.</p>
+      <div class="signals"><span>Real Chromium</span><span>DOM evidence</span><span>No vendor cloud</span></div>
+    </section>
+
+    <section class="workspace" aria-label="RenderLint workspace">
+      <aside class="sidebar">
+        <div class="sidebar-heading"><h2>Projects</h2><span id="project-count">0</span></div>
+        <div class="project-list" id="project-list"></div>
+        <p class="sidebar-empty" id="project-empty">Create a project to run its first preflight.</p>
+
+        <form class="project-form" id="project-form">
+          <h3>New project</h3>
+          <label><span>Project name</span><input name="name" maxlength="100" placeholder="Marketing site" required></label>
+          <label><span>Website URL</span><input name="targetUrl" type="url" placeholder="https://example.com" required></label>
+          <button class="button primary" type="submit">Create project</button>
+          <button class="demo-link" id="use-demo" type="button">Use the deliberately broken demo</button>
+        </form>
+      </aside>
+
+      <div class="main-panel">
+        <div class="placeholder" id="project-placeholder">
+          <span class="placeholder-mark">✓</span>
+          <h2>Select a project</h2>
+          <p>Its latest preflight report will appear here.</p>
+        </div>
+
+        <div id="project-view" hidden>
+          <header class="project-header">
+            <div>
+              <p class="eyebrow">Website preflight</p>
+              <h2 id="project-name"></h2>
+              <a id="project-url" href="#" target="_blank" rel="noreferrer"></a>
+            </div>
+            <div class="actions">
+              <button class="button quiet" id="copy-prompt" type="button" disabled>Copy agent brief</button>
+              <button class="button quiet" id="download-brief" type="button" disabled>Download repair brief</button>
+              <button class="button primary" id="run-scan" type="button">Run preflight</button>
+              <button class="button danger" id="delete-project" type="button">Delete</button>
+            </div>
+          </header>
+
+          <div class="scan-strip">
+            <div><span>Scan history</span><div class="scan-list" id="scan-list"></div></div>
+            <p id="scan-meta">No scans yet.</p>
+          </div>
+
+          <section class="scan-state" id="scan-state" hidden>
+            <span class="scanner-dot"></span>
+            <div><strong id="scan-state-title">Scanning website</strong><p id="scan-state-copy">Opening Chromium at three viewport sizes…</p></div>
+          </section>
+
+          <section class="report-empty" id="report-empty">
+            <span>01</span>
+            <h3>Run the first preflight</h3>
+            <p>RenderLint will inspect responsive layout, accessibility, console output, and network failures.</p>
+          </section>
+
+          <div id="report" hidden>
+            <section class="summary">
+              <div class="summary-total"><span>Verified findings</span><strong id="summary-total">0</strong></div>
+              <div class="summary-stat critical"><span>Critical</span><strong id="summary-critical">0</strong></div>
+              <div class="summary-stat high"><span>High</span><strong id="summary-high">0</strong></div>
+              <div class="summary-stat medium"><span>Medium</span><strong id="summary-medium">0</strong></div>
+              <div class="summary-stat low"><span>Low</span><strong id="summary-low">0</strong></div>
+            </section>
+
+            <section class="evidence-section">
+              <div class="section-title"><div><span>Evidence</span><h3>Rendered viewports</h3></div><small>Click to inspect the full capture</small></div>
+              <div class="evidence-grid" id="evidence-grid"></div>
+            </section>
+
+            <section class="issues-section">
+              <div class="section-title issue-title">
+                <div><span>Repair brief</span><h3>Actionable findings</h3></div>
+                <label>Filter <select id="issue-filter"><option value="all">All categories</option></select></label>
+              </div>
+              <div class="issue-list" id="issue-list"></div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell">RenderLint · deterministic checks first, AI-ready output second</footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

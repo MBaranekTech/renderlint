@@ -1,0 +1,26 @@
+services:
+  renderlint:
+    build: .
+    container_name: renderlint
+    init: true
+    ports:
+      - "127.0.0.1:8787:8787"
+    environment:
+      RENDERLINT_DATA_DIR: /data
+      PORT: 8787
+      HOST: 0.0.0.0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    shm_size: "1gb"
+    volumes:
+      - renderlint-data:/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8787/api/health').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  renderlint-data:

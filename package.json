@@ -1,0 +1,30 @@
+{
+  "name": "renderlint",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Real-browser QA before you ship",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "npm run test:unit",
+    "test:unit": "node --test tests/*.test.js",
+    "test:browser": "playwright test",
+    "test:smoke": "sh tests/smoke.sh",
+    "screenshots": "node scripts/capture-screenshots.js"
+  },
+  "dependencies": {
+    "axe-core": "4.14.0",
+    "express": "5.2.1",
+    "playwright": "1.63.0"
+  },
+  "engines": {
+    "node": ">=22.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  },
+  "overrides": {
+    "proxy-addr": "2.0.8",
+    "qs": "6.16.0"
+  }
+}

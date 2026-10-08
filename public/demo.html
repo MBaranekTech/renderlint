@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RenderLint broken demo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; color: #242722; background: #f4f3ed; font-family: Arial, sans-serif; }
+    header { display: flex; width: 900px; align-items: center; justify-content: space-between; padding: 18px 30px; background: #191d19; color: white; }
+    nav { display: flex; gap: 20px; }
+    main { width: 900px; padding: 60px 30px; }
+    h1 { font-size: 58px; line-height: .95; }
+    .cards { display: grid; grid-template-columns: repeat(3, 280px); gap: 20px; }
+    .card { height: 130px; overflow: hidden; padding: 20px; border-radius: 24px; background: white; }
+    .tiny { width: 26px; height: 26px; border: 0; border-radius: 50%; background: #c9ff4a; }
+    .low-contrast { color: #c8c8c3; }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>Generated Studio</strong>
+    <nav><a href="#work">Work</a><a href="#about">About</a><button class="tiny"></button></nav>
+  </header>
+  <main>
+    <h1>Looks fine on my screen.</h1>
+    <p class="low-contrast">This deliberately broken page gives RenderLint something real to detect.</p>
+    <img src="/missing-demo-image.png">
+    <section class="cards" id="work">
+      <article class="card"><h2>One</h2><p>This card uses a fixed desktop grid that refuses to collapse on mobile.</p></article>
+      <article class="card"><h2>Two</h2><p>Important content is clipped because this sentence is intentionally much too long for the fixed card height at narrow widths.</p></article>
+      <article class="card"><h2>Three</h2><p>Automated checks should produce selectors and evidence.</p></article>
+    </section>
+  </main>
+  <script>console.error('Intentional demo console error');</script>
+</body>
+</html>
