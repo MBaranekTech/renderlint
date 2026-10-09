@@ -95,7 +95,16 @@
             <section class="issues-section">
               <div class="section-title issue-title">
                 <div><span>Repair brief</span><h3>Actionable findings</h3></div>
-                <label>Filter <select id="issue-filter"><option value="all">All categories</option></select></label>
+                <div class="issue-filters">
+                  <div class="severity-filter" id="severity-filter" role="group" aria-label="Filter findings by severity">
+                    <button class="active" type="button" data-severity="all" aria-pressed="true">All</button>
+                    <button type="button" data-severity="critical" aria-pressed="false">Critical</button>
+                    <button type="button" data-severity="high" aria-pressed="false">High</button>
+                    <button type="button" data-severity="medium" aria-pressed="false">Medium</button>
+                    <button type="button" data-severity="low" aria-pressed="false">Low</button>
+                  </div>
+                  <label>Category <select id="issue-filter"><option value="all">All categories</option></select></label>
+                </div>
               </div>
               <div class="issue-list" id="issue-list"></div>
             </section>

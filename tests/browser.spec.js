@@ -35,6 +35,13 @@ test('creates a project, scans the broken demo, and renders an actionable report
     await expect(page.locator('#download-json')).toBeEnabled();
     await expect(page.locator('.copy-finding').first()).toBeVisible();
 
+    const criticalTotal = Number(await page.locator('#summary-critical').textContent());
+    await page.locator('#severity-filter [data-severity="critical"]').click();
+    await expect(page.locator('#issue-list .issue')).toHaveCount(criticalTotal);
+    await expect(page.locator('#issue-list .severity')).toHaveText(Array(criticalTotal).fill('critical'));
+    await page.locator('#severity-filter [data-severity="all"]').click();
+    await expect(page.locator('#issue-list .issue')).toHaveCount(Number(await page.locator('#summary-total').textContent()));
+
     const downloadPromise = page.waitForEvent('download');
     await page.locator('#download-brief').click();
     const download = await downloadPromise;

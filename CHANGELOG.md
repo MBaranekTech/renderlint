@@ -11,6 +11,7 @@ Versioning once a stable public API is established.
 - Export complete scan results as structured JSON reports.
 - Copy individual findings and rerun scans with `Ctrl/Command+Enter`.
 - Open target websites directly and delete individual scans with their stored evidence.
+- Filter actionable findings by severity and category at the same time.
 - GitHub Actions checks for unit, browser, Docker, and smoke tests.
 - Playwright browser-test configuration.
 - Project license and community health documentation.
