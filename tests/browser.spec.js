@@ -62,6 +62,12 @@ test('creates a project, scans the broken demo, and renders an actionable report
     expect(report.project.name).toBe('Broken demo');
     expect(report.scan.issues.length).toBeGreaterThan(0);
 
+    await page.evaluate(() => {
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: { writeText: () => Promise.reject(new DOMException('Write permission denied.', 'NotAllowedError')) },
+      });
+    });
     await page.locator('.copy-finding').first().click();
     await expect(page.locator('#toast')).toContainText('Finding copied.');
 
