@@ -1,7 +1,10 @@
 (() => {
   'use strict';
 
-  const state = { projects: [], activeProject: null, scans: [], activeScan: null, filter: 'all', pollToken: 0 };
+  const state = {
+    projects: [], activeProject: null, scans: [], activeScan: null,
+    categoryFilter: 'all', severityFilter: 'all', pollToken: 0,
+  };
   let toastTimer = 0;
   const $ = (id) => document.getElementById(id);
 
@@ -290,8 +293,13 @@
       option.textContent = category[0].toUpperCase() + category.slice(1);
       filter.appendChild(option);
     });
-    if (!categories.includes(state.filter)) state.filter = 'all';
-    filter.value = state.filter;
+    if (!categories.includes(state.categoryFilter)) state.categoryFilter = 'all';
+    filter.value = state.categoryFilter;
+    document.querySelectorAll('#severity-filter button').forEach((button) => {
+      const active = button.dataset.severity === state.severityFilter;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
     renderIssues();
   }
 
@@ -299,11 +307,14 @@
     const list = $('issue-list');
     list.innerHTML = '';
     if (!state.activeScan?.issues) return;
-    const issues = state.activeScan.issues.filter((issue) => state.filter === 'all' || issue.category === state.filter);
+    const issues = state.activeScan.issues.filter((issue) => (
+      (state.categoryFilter === 'all' || issue.category === state.categoryFilter)
+      && (state.severityFilter === 'all' || issue.severity === state.severityFilter)
+    ));
     if (!issues.length) {
       const empty = document.createElement('p');
       empty.className = 'no-findings';
-      empty.textContent = 'No findings in this category.';
+      empty.textContent = 'No findings match the selected filters.';
       list.appendChild(empty);
       return;
     }
@@ -442,7 +453,19 @@
   });
 
   $('issue-filter').addEventListener('change', (event) => {
-    state.filter = event.target.value;
+    state.categoryFilter = event.target.value;
+    renderIssues();
+  });
+
+  $('severity-filter').addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-severity]');
+    if (!button) return;
+    state.severityFilter = button.dataset.severity;
+    document.querySelectorAll('#severity-filter button').forEach((item) => {
+      const active = item === button;
+      item.classList.toggle('active', active);
+      item.setAttribute('aria-pressed', String(active));
+    });
     renderIssues();
   });
 
