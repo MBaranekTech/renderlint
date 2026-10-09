@@ -36,14 +36,22 @@
   }
 
   async function copyText(value) {
-    if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(value);
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(value);
+        return;
+      } catch {
+        // Sandboxed browsers can expose the Clipboard API while denying write permission.
+      }
+    }
     const textarea = document.createElement('textarea');
     textarea.value = value;
     textarea.style.cssText = 'position:fixed;opacity:0';
     document.body.appendChild(textarea);
     textarea.select();
-    document.execCommand('copy');
+    const copied = document.execCommand('copy');
     textarea.remove();
+    if (!copied) throw new Error('Clipboard access is unavailable in this browser.');
   }
 
   function downloadScan(path) {
