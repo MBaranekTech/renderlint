@@ -9,6 +9,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # MCR does not consistently expose image publication dates, so the
+    # default cooldown cannot be evaluated for Playwright image updates.
+    cooldown:
+      default-days: 0
     open-pull-requests-limit: 3
   - package-ecosystem: github-actions
     directory: /
