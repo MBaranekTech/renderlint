@@ -6,6 +6,8 @@
     categoryFilter: 'all', severityFilter: 'all', pollToken: 0,
   };
   let toastTimer = 0;
+  let activeEvidence = [];
+  let activeEvidenceIndex = 0;
   const $ = (id) => document.getElementById(id);
 
   async function request(url, options = {}, expectText = false) {
@@ -33,6 +35,59 @@
   function formatDate(value) {
     if (!value) return '';
     return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+  }
+
+  function showEvidenceItem(index) {
+    const item = activeEvidence[index];
+    if (!item) return;
+    activeEvidenceIndex = index;
+    const image = $('evidence-dialog-image');
+    image.src = item.screenshot;
+    image.alt = `${item.viewport} screenshot highlighting ${$('evidence-dialog-title').textContent}`;
+    const highlight = $('evidence-highlight');
+    const rect = item.rect;
+    highlight.hidden = !rect;
+    $('evidence-dialog-note').textContent = rect
+      ? `Highlighted at ${item.viewport} (${item.width}px wide)`
+      : `Full ${item.viewport} capture · no element bounds available`;
+    if (rect) {
+      const placeHighlight = () => {
+        const scale = image.clientWidth / item.width;
+        highlight.style.left = `${Math.max(0, rect.x * scale)}px`;
+        highlight.style.top = `${Math.max(0, rect.y * scale)}px`;
+        highlight.style.width = `${Math.max(0, rect.width * scale)}px`;
+        highlight.style.height = `${Math.max(0, rect.height * scale)}px`;
+        $('evidence-stage').scrollTo({ top: Math.max(0, rect.y * scale - 72) });
+      };
+      if (image.complete) requestAnimationFrame(placeHighlight);
+      else image.addEventListener('load', placeHighlight, { once: true });
+    }
+    document.querySelectorAll('#evidence-tabs button').forEach((button, buttonIndex) => {
+      const selected = buttonIndex === index;
+      button.classList.toggle('active', selected);
+      button.setAttribute('aria-selected', String(selected));
+      button.tabIndex = selected ? 0 : -1;
+    });
+    if (!rect) $('evidence-stage').scrollTo({ top: 0 });
+  }
+
+  function openEvidence(issue) {
+    if (!issue.evidence?.length) return;
+    activeEvidence = issue.evidence;
+    $('evidence-dialog-title').textContent = issue.title;
+    $('evidence-dialog-selector').textContent = issue.selector;
+    const tabs = $('evidence-tabs');
+    tabs.innerHTML = '';
+    activeEvidence.forEach((item, index) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.role = 'tab';
+      button.textContent = item.viewport;
+      button.addEventListener('click', () => showEvidenceItem(index));
+      tabs.appendChild(button);
+    });
+    $('evidence-dialog').showModal();
+    showEvidenceItem(0);
   }
 
   async function copyText(value) {
@@ -358,7 +413,18 @@
           toast(error.message, true);
         }
       });
-      heading.append(title, copyButton);
+      const issueActions = document.createElement('div');
+      issueActions.className = 'issue-actions';
+      if (issue.evidence?.length) {
+        const inspectButton = document.createElement('button');
+        inspectButton.className = 'inspect-finding';
+        inspectButton.type = 'button';
+        inspectButton.textContent = issue.evidence.some((item) => item.rect) ? 'Inspect highlight' : 'Inspect screenshot';
+        inspectButton.addEventListener('click', () => openEvidence(issue));
+        issueActions.appendChild(inspectButton);
+      }
+      issueActions.appendChild(copyButton);
+      heading.append(title, issueActions);
       const detail = document.createElement('p');
       detail.textContent = issue.detail;
       const selector = document.createElement('code');
@@ -475,6 +541,14 @@
       item.setAttribute('aria-pressed', String(active));
     });
     renderIssues();
+  });
+
+  $('evidence-dialog-close').addEventListener('click', () => $('evidence-dialog').close());
+  $('evidence-dialog').addEventListener('click', (event) => {
+    if (event.target === event.currentTarget) event.currentTarget.close();
+  });
+  window.addEventListener('resize', () => {
+    if ($('evidence-dialog').open) showEvidenceItem(activeEvidenceIndex);
   });
 
   loadProjects().catch((error) => toast(error.message, true));

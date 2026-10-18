@@ -18,6 +18,7 @@ exact DOM selectors and evidence for Codex, Claude Code, Cursor, or another codi
 - Project-based scans with persistent SQLite history.
 - Real Chromium rendering through Playwright.
 - Full-page evidence at `390px`, `768px`, and `1440px`.
+- Finding-level evidence viewer with affected elements highlighted in each viewport.
 - Horizontal overflow, off-screen element, clipping, and touch-target checks.
 - Accessibility checks powered by axe-core.
 - Console error, page error, failed request, and HTTP error capture.
@@ -114,7 +115,7 @@ on the host. Read [SECURITY.md](SECURITY.md) before any shared or remote deploym
 ## Current limitations
 
 - A project scans one URL; RenderLint does not crawl an entire website.
-- Screenshots are full-page evidence, not annotated crops for individual findings.
+- Findings without stable element bounds, such as document-level runtime errors, use full-page evidence.
 - There are no visual-regression baselines or automatic before/after comparisons yet.
 - Performance checks and Core Web Vitals are not included.
 - Scan execution uses an in-process queue and is intended for a single trusted user.
@@ -128,7 +129,6 @@ Issues and pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING
 
 ## Planned next steps
 
-- Screenshot regions linked directly to each finding.
 - Before/after verification and visual regression baselines.
 - Broken-link crawling beyond resources loaded by the current page.
 - Lighthouse performance and SEO results.

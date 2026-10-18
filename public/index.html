@@ -6,8 +6,8 @@
   <meta name="description" content="Real-browser QA before you ship.">
   <title>RenderLint — real-browser QA before you ship</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="app.css?v=1">
-  <script src="app.js?v=1" defer></script>
+  <link rel="stylesheet" href="app.css?v=2">
+  <script src="app.js?v=2" defer></script>
 </head>
 <body>
   <header class="topbar shell">
@@ -116,5 +116,28 @@
 
   <footer class="shell">RenderLint · deterministic checks first, AI-ready output second</footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <dialog class="evidence-dialog" id="evidence-dialog" aria-labelledby="evidence-dialog-title">
+    <div class="evidence-dialog-header">
+      <div>
+        <span class="evidence-dialog-label">Finding evidence</span>
+        <h2 id="evidence-dialog-title"></h2>
+        <code id="evidence-dialog-selector"></code>
+      </div>
+      <button class="evidence-dialog-close" id="evidence-dialog-close" type="button" aria-label="Close evidence viewer">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="evidence-dialog-toolbar">
+      <div class="evidence-tabs" id="evidence-tabs" role="tablist" aria-label="Evidence viewport"></div>
+      <p id="evidence-dialog-note"></p>
+    </div>
+    <div class="evidence-stage" id="evidence-stage">
+      <div class="evidence-canvas">
+        <img id="evidence-dialog-image" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="">
+        <span class="evidence-highlight" id="evidence-highlight" aria-hidden="true"><i></i></span>
+      </div>
+    </div>
+  </dialog>
 </body>
 </html>

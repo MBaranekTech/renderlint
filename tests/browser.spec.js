@@ -30,6 +30,7 @@ test('creates a project, scans the broken demo, and renders an actionable report
     await expect(page.locator('#evidence-grid .evidence-card')).toHaveCount(3);
     await expect(page.locator('#issue-list')).toContainText('Buttons must have discernible text');
     await expect(page.locator('#issue-list')).toContainText('Page overflows horizontally');
+    await expect(page.locator('.inspect-finding').first()).toBeVisible();
     await expect(page.locator('#copy-prompt')).toBeEnabled();
     await expect(page.locator('#download-brief')).toBeEnabled();
     await expect(page.locator('#download-json')).toBeEnabled();
@@ -70,6 +71,15 @@ test('creates a project, scans the broken demo, and renders an actionable report
     });
     await page.locator('.copy-finding').first().click();
     await expect(page.locator('#toast')).toContainText('Finding copied.');
+
+    const highlightedFinding = page.locator('.issue').filter({ has: page.locator('.inspect-finding', { hasText: 'Inspect highlight' }) }).first();
+    await highlightedFinding.locator('.inspect-finding').click();
+    await expect(page.locator('#evidence-dialog')).toBeVisible();
+    await expect(page.locator('#evidence-dialog-title')).not.toBeEmpty();
+    await expect(page.locator('#evidence-highlight')).toBeVisible();
+    await expect(page.locator('#evidence-dialog-image')).toHaveAttribute('src', /\/evidence\//);
+    await page.locator('#evidence-dialog-close').click();
+    await expect(page.locator('#evidence-dialog')).toBeHidden();
 
     const scanCount = await page.locator('#scan-list .scan-chip').count();
     await page.keyboard.press('Control+Enter');
