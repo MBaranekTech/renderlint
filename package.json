@@ -21,7 +21,7 @@
     "node": ">=22.5"
   },
   "devDependencies": {
-    "@playwright/test": "1.64.0"
+    "@playwright/test": "1.64.1"
   },
   "overrides": {
     "proxy-addr": "2.0.8",
