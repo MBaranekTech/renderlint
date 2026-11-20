@@ -13,7 +13,7 @@
     "screenshots": "node scripts/capture-screenshots.js"
   },
   "dependencies": {
-    "axe-core": "4.14.0",
+    "axe-core": "4.14.1",
     "express": "5.2.1",
     "playwright": "1.64.0"
   },
